@@ -78,8 +78,8 @@ app.delete('/paciente/:id', async(req, res) => {
 })
 
 app.post('/paciente',async(req, res)=>{
-    const {nome, idade, altura, peso}=req.body;
-    if(!nome||!idade||!altura||!peso){
+    const {nome, idade, altura, peso, telefone, email}=req.body;
+    if(!nome||!idade||!altura||!peso||!telefone||!email){
     res.status(400).json({ 
     messagem: "Solicitação Inválida",
     detalhe: error.message 
@@ -87,11 +87,13 @@ app.post('/paciente',async(req, res)=>{
     }
     const{imc,status}=calcularIMC(Number(peso),Number(altura));
     try{
-        const[resultado]=await db.execute("INSERT INTO `pacientes` ( `nome`, `idade`, `altura`, `peso`, `imc`, status) VALUES (?,?,?,?,?,?);",[nome,idade,altura,peso,imc,status]);
+        const[resultado]=await db.execute("INSERT INTO `pacientes` ( `nome`, `idade`,`telefone`,`email`, `altura`, `peso`, `imc`, status) VALUES (?,?,?,?,?,?,?,?);",[nome,idade,telefone,email,altura,peso,imc,status]);
         res.status(201).json({
             id:resultado.insertId,
             nome,
             idade,
+            telefone,
+            email,
             altura,
             peso,
             imc,
@@ -106,8 +108,8 @@ app.post('/paciente',async(req, res)=>{
 })
 app.put('/paciente/:id', async (req, res) => {
     const { id } = req.params;
-    const { nome, idade, altura, peso } = req.body;
-    if (!nome || !idade || !altura || !peso) {
+    const { nome, idade, altura, peso, telefone, email } = req.body;
+    if (!nome || !idade || !altura || !peso || !telefone || !email) {
         res.status(400).json({
             mensagem: " Solicitação Inválida!",
             detalhes: error.message
@@ -115,7 +117,7 @@ app.put('/paciente/:id', async (req, res) => {
     }
     const { imc, status } = calcularIMC(Number(peso), Number(altura));
     try {
-        const [resultado] = await db.execute("UPDATE `pacientes` SET `nome` = ?, `idade` = ?, `altura` = ?, `peso` = ?, `imc` = ?, `status` = ? WHERE `pacientes`.`id` = ?;", [nome, idade, altura, peso, imc, status, id]);
+        const [resultado] = await db.execute("UPDATE `pacientes` SET `nome` = ?, `idade` = ?,`telefone`=?,`email`=?, `altura` = ?, `peso` = ?, `imc` = ?, `status` = ? WHERE `pacientes`.`id` = ?;", [nome, idade, telefone, email, altura, peso, imc, status, id]);
         if (resultado.affectedRows === 0) {
             return res.status(404).json({ mensagem: "Paciente não encontrado!" });
         }
